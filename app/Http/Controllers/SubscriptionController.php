@@ -23,8 +23,8 @@ class SubscriptionController extends Controller
         return response()->json([
             'message' => 'Subscribed successfully',
             'subscription' => [
-                'email' => $result['user']->email,
-                'website_url' => $result['website']->url,
+                'email' => $result->user->email,
+                'website_url' => $result->website->url,
             ],
         ], 201);
     }

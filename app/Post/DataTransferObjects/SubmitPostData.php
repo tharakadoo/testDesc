@@ -12,9 +12,6 @@ class SubmitPostData
         public int $website_id,
     ) {}
 
-    /**
-     * @throws ValidationException
-     */
     public static function fromArray(array $data): self
     {
         if (empty($data['title'])) {

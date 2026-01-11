@@ -316,12 +316,12 @@ composer test
 ---
 
 ## Phase 5: Apply Step-Down Rule to Tests
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ### Tasks:
-- [ ] Reorder protected methods in `PostSubmitUseCaseTest` by first call appearance
-- [ ] Reorder protected methods in `SubscribeUseCaseTest` by first call appearance
-- [ ] Move data providers to end of file
+- [x] Reorder protected methods in `PostSubmitUseCaseTest` by first call appearance
+- [x] Reorder protected methods in `SubscribeUseCaseTest` by first call appearance
+- [x] Move data providers to end of file
 
 ### Files:
 | File | Action |
@@ -337,11 +337,11 @@ composer test
 ---
 
 ## Phase 6: Fix Test Ordering (Negative First)
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ### Tasks:
-- [ ] Reorder test methods in `PostSubmitUseCaseTest`: negative scenarios before positive
-- [ ] Verify `SubscribeUseCaseTest` already follows correct order
+- [x] Reorder test methods in `PostSubmitUseCaseTest`: negative scenarios before positive
+- [x] Verify `SubscribeUseCaseTest` already follows correct order (confirmed)
 
 ### Files:
 | File | Action |
@@ -356,12 +356,14 @@ composer test
 ---
 
 ## Phase 7: Rename Variables (Domain-Specific Names)
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ### Tasks:
-- [ ] Replace `$postData` with `$submitPost` or similar domain names
-- [ ] Replace `$subscribeData` with `$subscription` or similar
-- [ ] Replace `$data` parameter names with descriptive names
+- [x] Replace `$postData` with `$submitPost` in PostSubmitUseCaseTest
+- [x] Rename `buildPostData()` to `buildSubmitPost()` in PostSubmitUseCaseTest
+- [x] Replace `$subscribeData` with `$subscriptionRequest` in SubscribeUseCaseTest
+- [x] Replace `$data` with `$submitPost` in PostSubmitUseCase::execute()
+- [x] Replace `$data` with `$subscriptionRequest` in SubscribeUseCase::execute()
 
 ### Files:
 | File | Action |
@@ -379,11 +381,10 @@ composer test
 ---
 
 ## Phase 8: Remove Docblock Comments
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ### Tasks:
-- [ ] Remove `@throws ValidationException` docblock from `SubmitPostData.php`
-- [ ] Remove any other redundant docblocks
+- [x] Remove `@throws ValidationException` docblock from `SubmitPostData.php`
 
 ### Files:
 | File | Action |
@@ -398,13 +399,13 @@ composer test
 ---
 
 ## Phase 9: Refactor UseCase Return Types
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ### Tasks:
-- [ ] Create a `Subscription` entity or value object if needed
-- [ ] Update `SubscribeUseCase` to return domain data instead of formatted array
-- [ ] Update controller to handle new return type
-- [ ] Update tests
+- [x] Create a `Subscription` entity or value object if needed
+- [x] Update `SubscribeUseCase` to return domain data instead of formatted array
+- [x] Update controller to handle new return type
+- [x] Update tests
 
 ### Files:
 | File | Action |

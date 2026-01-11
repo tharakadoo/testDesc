@@ -4,6 +4,7 @@ namespace App\Website\UseCases;
 
 use App\User\Repositories\UserRepositoryInterface;
 use App\Website\DataTransferObjects\SubscribeData;
+use App\Website\DataTransferObjects\SubscriptionResult;
 use App\Website\Repositories\SubscriptionRepositoryInterface;
 use App\Website\Repositories\WebsiteRepositoryInterface;
 use Illuminate\Validation\ValidationException;
@@ -16,9 +17,9 @@ class SubscribeUseCase
         private SubscriptionRepositoryInterface $subscription,
     ) {}
 
-    public function execute(array $data): array
+    public function execute(array $subscriptionRequest): SubscriptionResult
     {
-        $dto = SubscribeData::fromArray($data);
+        $dto = SubscribeData::fromArray($subscriptionRequest);
 
         $website = $this->website->find($dto->website_id);
 
@@ -34,10 +35,6 @@ class SubscribeUseCase
 
         $this->subscription->subscribe($user, $website);
 
-        return [
-            'user' => $user,
-            'website' => $website,
-            'subscribed' => true,
-        ];
+        return new SubscriptionResult($user, $website);
     }
 }

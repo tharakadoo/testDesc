@@ -19,9 +19,9 @@ class PostSubmitUseCase
         private CacheContract $cache,
     ) {}
 
-    public function execute(array $data): Post
+    public function execute(array $submitPost): Post
     {
-        $dto = SubmitPostData::fromArray($data);
+        $dto = SubmitPostData::fromArray($submitPost);
 
         $post = $this->post->create([
             'title' => $dto->title,

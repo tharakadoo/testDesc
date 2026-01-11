@@ -7,6 +7,7 @@ use Tests\TestCase;
 use App\User\Entities\User;
 use App\Website\Entities\Website;
 use App\User\Repositories\UserRepositoryInterface;
+use App\Website\DataTransferObjects\SubscriptionResult;
 use App\Website\UseCases\SubscribeUseCase;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -24,7 +25,7 @@ class SubscribeUseCaseTest extends TestCase
 
     #[Test]
     #[DataProvider('missingFieldProvider')]
-    public function when_missing_required_field_then_throws_validation_exception(array $subscribeData, string $field, array $expectedMessage): void
+    public function when_missing_required_field_then_throws_validation_exception(array $subscriptionRequest, string $field, array $expectedMessage): void
     {
         $websiteRepository = Mockery::mock(WebsiteRepositoryInterface::class);
         $userRepository = Mockery::mock(UserRepositoryInterface::class);
@@ -34,13 +35,13 @@ class SubscribeUseCaseTest extends TestCase
 
         $useCase = new SubscribeUseCase($websiteRepository, $userRepository, $subscriptionRepository);
 
-        $this->assertValidationException($useCase, $subscribeData, $field, $expectedMessage);
+        $this->assertValidationException($useCase, $subscriptionRequest, $field, $expectedMessage);
     }
 
     #[Test]
     public function when_website_not_found_then_throws_validation_exception(): void
     {
-        $subscribeData = [
+        $subscriptionRequest = [
             'email' => 'user@example.com',
             'website_id' => 999,
         ];
@@ -59,13 +60,13 @@ class SubscribeUseCaseTest extends TestCase
 
         $useCase = new SubscribeUseCase($websiteRepository, $userRepository, $subscriptionRepository);
 
-        $this->assertWebsiteNotFound($useCase, $subscribeData);
+        $this->assertWebsiteNotFound($useCase, $subscriptionRequest);
     }
 
     #[Test]
     public function when_already_subscribed_then_throws_validation_exception(): void
     {
-        $subscribeData = [
+        $subscriptionRequest = [
             'email' => 'user@example.com',
             'website_id' => 1,
         ];
@@ -94,13 +95,13 @@ class SubscribeUseCaseTest extends TestCase
 
         $useCase = new SubscribeUseCase($websiteRepository, $userRepository, $subscriptionRepository);
 
-        $this->assertAlreadySubscribed($useCase, $subscribeData);
+        $this->assertAlreadySubscribed($useCase, $subscriptionRequest);
     }
 
     #[Test]
     public function when_subscribe_then_subscription_created(): void
     {
-        $subscribeData = [
+        $subscriptionRequest = [
             'email' => 'user@example.com',
             'website_id' => 1,
         ];
@@ -131,9 +132,49 @@ class SubscribeUseCaseTest extends TestCase
 
         $useCase = new SubscribeUseCase($websiteRepository, $userRepository, $subscriptionRepository);
 
-        $result = $useCase->execute($subscribeData);
+        $result = $useCase->execute($subscriptionRequest);
 
         $this->assertSubscriptionCreated($result, $user, $website);
+    }
+
+    protected function assertValidationException(SubscribeUseCase $useCase, array $subscriptionRequest, string $field, array $expectedMessage): void
+    {
+        try {
+            $useCase->execute($subscriptionRequest);
+            $this->fail('Expected ValidationException not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey($field, $e->errors());
+            $this->assertEquals($expectedMessage, $e->errors()[$field]);
+        }
+    }
+
+    protected function assertWebsiteNotFound(SubscribeUseCase $useCase, array $subscriptionRequest): void
+    {
+        try {
+            $useCase->execute($subscriptionRequest);
+            $this->fail('Expected ValidationException not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('website_id', $e->errors());
+            $this->assertEquals(['Website not found'], $e->errors()['website_id']);
+        }
+    }
+
+    protected function assertAlreadySubscribed(SubscribeUseCase $useCase, array $subscriptionRequest): void
+    {
+        try {
+            $useCase->execute($subscriptionRequest);
+            $this->fail('Expected ValidationException not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('email', $e->errors());
+            $this->assertEquals(['Already subscribed to this website'], $e->errors()['email']);
+        }
+    }
+
+    protected function assertSubscriptionCreated(SubscriptionResult $result, User $user, Website $website): void
+    {
+        $this->assertInstanceOf(SubscriptionResult::class, $result);
+        $this->assertSame($user->email, $result->user->email);
+        $this->assertSame($website->url, $result->website->url);
     }
 
     public static function missingFieldProvider(): array
@@ -155,45 +196,5 @@ class SubscribeUseCaseTest extends TestCase
                 ['Website is required'],
             ],
         ];
-    }
-
-    protected function assertValidationException(SubscribeUseCase $useCase, array $subscribeData, string $field, array $expectedMessage): void
-    {
-        try {
-            $useCase->execute($subscribeData);
-            $this->fail('Expected ValidationException not thrown');
-        } catch (ValidationException $e) {
-            $this->assertArrayHasKey($field, $e->errors());
-            $this->assertEquals($expectedMessage, $e->errors()[$field]);
-        }
-    }
-
-    protected function assertWebsiteNotFound(SubscribeUseCase $useCase, array $subscribeData): void
-    {
-        try {
-            $useCase->execute($subscribeData);
-            $this->fail('Expected ValidationException not thrown');
-        } catch (ValidationException $e) {
-            $this->assertArrayHasKey('website_id', $e->errors());
-            $this->assertEquals(['Website not found'], $e->errors()['website_id']);
-        }
-    }
-
-    protected function assertAlreadySubscribed(SubscribeUseCase $useCase, array $subscribeData): void
-    {
-        try {
-            $useCase->execute($subscribeData);
-            $this->fail('Expected ValidationException not thrown');
-        } catch (ValidationException $e) {
-            $this->assertArrayHasKey('email', $e->errors());
-            $this->assertEquals(['Already subscribed to this website'], $e->errors()['email']);
-        }
-    }
-
-    protected function assertSubscriptionCreated(array $result, User $user, Website $website): void
-    {
-        $this->assertSame($user->email, $result['user']->email);
-        $this->assertSame($website->url, $result['website']->url);
-        $this->assertTrue($result['subscribed']);
     }
 }
