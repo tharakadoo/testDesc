@@ -46,7 +46,7 @@
 
 - App
     - Application
-        - Contracts `shared contracts across domains`
+        - Contracts
             - CacheContract.php
             - TransactionContract.php
         - Listeners
@@ -59,7 +59,7 @@
             - Controller.php
             - PostController.php
             - SubscriptionController.php
-    - Infrastructure `framework-specific implementations`
+    - Infrastructure
         - Email
             - EmailService.php
         - Repositories
@@ -74,10 +74,10 @@
             - LaravelTransactionService.php
     - Mail
         - PostPublishedMail.php
-    - Post `Post domain (DDD bounded context)`
+    - Post
         - Contracts
             - EmailServiceContract.php
-        - DataTransferObjects `SRP - validation separated from business logic`
+        - DataTransferObjects
             - PostResult.php
             - SubmitPostData.php
         - Entities
@@ -86,22 +86,22 @@
             - Subscriber.php
         - Events
             - PostPublished.php
-        - Repositories `dependency inversion - interfaces only`
+        - Repositories
             - PostRepositoryInterface.php
         - Testing
             - PostSubmitUseCaseTest.php
             - PostTest.php
-        - UseCases `business logic orchestration`
+        - UseCases
             - PostSubmitUseCase.php
     - Providers
         - AppServiceProvider.php
         - EventServiceProvider.php
-    - User `User domain (DDD bounded context)`
+    - User
         - Entities
             - User.php
         - Repositories
             - UserRepositoryInterface.php
-    - Website `Website domain (DDD bounded context)`
+    - Website
         - Contracts
             - WebsiteUserServiceContract.php
         - DataTransferObjects
