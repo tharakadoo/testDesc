@@ -2,6 +2,7 @@
 
 namespace App\Website\UseCases;
 
+use App\Application\Contracts\TransactionContract;
 use App\User\Repositories\UserRepositoryInterface;
 use App\Website\DataTransferObjects\SubscribeData;
 use App\Website\DataTransferObjects\SubscriptionResult;
@@ -15,6 +16,7 @@ class SubscribeUseCase
         private WebsiteRepositoryInterface $website,
         private UserRepositoryInterface $user,
         private SubscriptionRepositoryInterface $subscription,
+        private TransactionContract $transaction,
     ) {}
 
     public function execute(array $subscriptionRequest): SubscriptionResult
@@ -27,14 +29,16 @@ class SubscribeUseCase
             throw ValidationException::withMessages(['website_id' => ['Website not found']]);
         }
 
-        $user = $this->user->findOrCreate($dto->email);
+        return $this->transaction->execute(function () use ($dto, $website) {
+            $user = $this->user->findOrCreate($dto->email);
 
-        if ($this->subscription->isSubscribed($user, $website)) {
-            throw ValidationException::withMessages(['email' => ['Already subscribed to this website']]);
-        }
+            if ($this->subscription->isSubscribed($user, $website)) {
+                throw ValidationException::withMessages(['email' => ['Already subscribed to this website']]);
+            }
 
-        $this->subscription->subscribe($user, $website);
+            $this->subscription->subscribe($user, $website);
 
-        return new SubscriptionResult($user, $website);
+            return new SubscriptionResult($user, $website);
+        });
     }
 }

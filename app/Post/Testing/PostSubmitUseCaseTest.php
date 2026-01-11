@@ -5,16 +5,15 @@ namespace App\Post\Testing;
 use Mockery;
 use Tests\TestCase;
 use App\Post\Entities\Post;
-use App\User\Entities\User;
-use App\Application\Contracts\CacheContract;
+use App\Post\Events\PostPublished;
+use App\Application\Contracts\TransactionContract;
+use App\Post\DataTransferObjects\PostResult;
 use App\Post\UseCases\PostSubmitUseCase;
-use App\Post\Contracts\EmailServiceContract;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use App\Post\Repositories\PostRepositoryInterface;
-use App\Website\Contracts\WebsiteUserServiceContract;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class PostSubmitUseCaseTest extends TestCase
 {
@@ -34,48 +33,10 @@ class PostSubmitUseCaseTest extends TestCase
     }
 
     #[Test]
-    public function when_user_already_received_email_then_email_not_sent_again(): void
-    {
-        $submitPost = $this->buildSubmitPost();
-
-        $user1 = new User(['id' => 1, 'email' => 'u1@example.com']);
-        $user2 = new User(['id' => 2, 'email' => 'u2@example.com']);
-
-        $post = $this->createMockPostWithExistingEmailedUser($submitPost, $user1, $user2);
-
-        $repository = Mockery::mock(PostRepositoryInterface::class);
-        $repository->shouldReceive('create')
-            ->once()
-            ->with($submitPost)
-            ->andReturn($post);
-
-        $userProvider = Mockery::mock(WebsiteUserServiceContract::class);
-        $userProvider->shouldReceive('getUsersForWebsite')
-            ->once()
-            ->with(1)
-            ->andReturn(collect([$user1, $user2]));
-
-        $emailService = Mockery::mock(EmailServiceContract::class);
-        $emailService->shouldReceive('send')
-            ->once()
-            ->with(Mockery::subset(['to' => 'u2@example.com', 'post' => $post]));
-        $emailService->shouldNotReceive('send')
-            ->with(Mockery::subset(['to' => 'u1@example.com']));
-
-        $cache = Mockery::mock(CacheContract::class);
-        $cache->shouldReceive('remember')
-            ->andReturnUsing(fn($key, $seconds, $callback) => $callback());
-
-        $useCase = new PostSubmitUseCase($repository, $userProvider, $emailService, $cache);
-
-        $result = $useCase->execute($submitPost);
-
-        $this->assertPostCreated($result, $submitPost);
-    }
-
-    #[Test]
     public function when_post_created_then_post_saved(): void
     {
+        Event::fake();
+
         $submitPost = $this->buildSubmitPost();
         $post = $this->createMockPost($submitPost);
 
@@ -85,17 +46,9 @@ class PostSubmitUseCaseTest extends TestCase
             ->with($submitPost)
             ->andReturn($post);
 
-        $userProvider = Mockery::mock(WebsiteUserServiceContract::class);
-        $userProvider->shouldReceive('getUsersForWebsite')
-            ->andReturn(collect([]));
+        $transaction = $this->createMockTransaction();
 
-        $emailService = Mockery::mock(EmailServiceContract::class);
-
-        $cache = Mockery::mock(CacheContract::class);
-        $cache->shouldReceive('remember')
-            ->andReturnUsing(fn($key, $seconds, $callback) => $callback());
-
-        $useCase = new PostSubmitUseCase($repository, $userProvider, $emailService, $cache);
+        $useCase = new PostSubmitUseCase($repository, $transaction);
 
         $result = $useCase->execute($submitPost);
 
@@ -103,14 +56,12 @@ class PostSubmitUseCaseTest extends TestCase
     }
 
     #[Test]
-    public function when_post_created_then_emails_sent_to_subscribers(): void
+    public function when_post_created_then_post_published_event_dispatched(): void
     {
+        Event::fake();
+
         $submitPost = $this->buildSubmitPost();
-
-        $user1 = new User(['id' => 1, 'email' => 'u1@example.com']);
-        $user2 = new User(['id' => 2, 'email' => 'u2@example.com']);
-
-        $post = $this->createMockPostWithEmailTracking($submitPost, [$user1, $user2]);
+        $post = $this->createMockPost($submitPost);
 
         $repository = Mockery::mock(PostRepositoryInterface::class);
         $repository->shouldReceive('create')
@@ -118,29 +69,15 @@ class PostSubmitUseCaseTest extends TestCase
             ->with($submitPost)
             ->andReturn($post);
 
-        $userProvider = Mockery::mock(WebsiteUserServiceContract::class);
-        $userProvider->shouldReceive('getUsersForWebsite')
-            ->once()
-            ->with(1)
-            ->andReturn(collect([$user1, $user2]));
+        $transaction = $this->createMockTransaction();
 
-        $emailService = Mockery::mock(EmailServiceContract::class);
-        $emailService->shouldReceive('send')
-            ->once()
-            ->with(Mockery::subset(['to' => 'u1@example.com', 'post' => $post]));
-        $emailService->shouldReceive('send')
-            ->once()
-            ->with(Mockery::subset(['to' => 'u2@example.com', 'post' => $post]));
+        $useCase = new PostSubmitUseCase($repository, $transaction);
 
-        $cache = Mockery::mock(CacheContract::class);
-        $cache->shouldReceive('remember')
-            ->andReturnUsing(fn($key, $seconds, $callback) => $callback());
+        $useCase->execute($submitPost);
 
-        $useCase = new PostSubmitUseCase($repository, $userProvider, $emailService, $cache);
-
-        $result = $useCase->execute($submitPost);
-
-        $this->assertPostCreated($result, $submitPost);
+        Event::assertDispatched(PostPublished::class, function ($event) use ($post) {
+            return $event->post === $post;
+        });
     }
 
     protected function createUseCase(): PostSubmitUseCase
@@ -148,11 +85,18 @@ class PostSubmitUseCaseTest extends TestCase
         $repository = Mockery::mock(PostRepositoryInterface::class);
         $repository->shouldNotReceive('create');
 
-        $userProvider = Mockery::mock(WebsiteUserServiceContract::class);
-        $emailService = Mockery::mock(EmailServiceContract::class);
-        $cache = Mockery::mock(CacheContract::class);
+        $transaction = $this->createMockTransaction();
 
-        return new PostSubmitUseCase($repository, $userProvider, $emailService, $cache);
+        return new PostSubmitUseCase($repository, $transaction);
+    }
+
+    protected function createMockTransaction(): TransactionContract
+    {
+        $transaction = Mockery::mock(TransactionContract::class);
+        $transaction->shouldReceive('execute')
+            ->andReturnUsing(fn(callable $callback) => $callback());
+
+        return $transaction;
     }
 
     protected function assertValidationException(PostSubmitUseCase $useCase, array $submitPost, string $field, array $expectedMessage): void
@@ -178,63 +122,20 @@ class PostSubmitUseCaseTest extends TestCase
     protected function createMockPost(array $submitPost): Post
     {
         $post = Mockery::mock(Post::class)->makePartial();
+        $post->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $post->shouldReceive('getAttribute')->with('title')->andReturn($submitPost['title']);
         $post->shouldReceive('getAttribute')->with('description')->andReturn($submitPost['description']);
         $post->shouldReceive('getAttribute')->with('website_id')->andReturn($submitPost['website_id']);
 
-        $relation = Mockery::mock(BelongsToMany::class);
-        $relation->shouldReceive('where')->andReturnSelf();
-        $relation->shouldReceive('exists')->andReturn(false);
-        $relation->shouldReceive('attach');
-        $post->shouldReceive('emailedUsers')->andReturn($relation);
-
         return $post;
     }
 
-    protected function assertPostCreated(Post $created, array $submitPost): void
+    protected function assertPostCreated(PostResult $result, array $submitPost): void
     {
-        $this->assertInstanceOf(Post::class, $created);
-        $this->assertEquals($submitPost['title'], $created->title);
-        $this->assertEquals($submitPost['description'], $created->description);
-        $this->assertEquals($submitPost['website_id'], $created->website_id);
-    }
-
-    protected function createMockPostWithEmailTracking(array $submitPost, array $users): Post
-    {
-        $post = Mockery::mock(Post::class)->makePartial();
-        $post->shouldReceive('getAttribute')->with('title')->andReturn($submitPost['title']);
-        $post->shouldReceive('getAttribute')->with('description')->andReturn($submitPost['description']);
-        $post->shouldReceive('getAttribute')->with('website_id')->andReturn($submitPost['website_id']);
-
-        $relation = Mockery::mock(BelongsToMany::class);
-        $relation->shouldReceive('where')->andReturnSelf();
-        $relation->shouldReceive('exists')->andReturn(false);
-
-        foreach ($users as $user) {
-            $relation->shouldReceive('attach')->with($user->id)->once();
-        }
-
-        $post->shouldReceive('emailedUsers')->andReturn($relation);
-
-        return $post;
-    }
-
-    protected function createMockPostWithExistingEmailedUser(array $submitPost, User $existingUser, User $newUser): Post
-    {
-        $post = Mockery::mock(Post::class)->makePartial();
-        $post->shouldReceive('getAttribute')->with('title')->andReturn($submitPost['title']);
-        $post->shouldReceive('getAttribute')->with('description')->andReturn($submitPost['description']);
-        $post->shouldReceive('getAttribute')->with('website_id')->andReturn($submitPost['website_id']);
-
-        $relation = Mockery::mock(BelongsToMany::class);
-        $relation->shouldReceive('where')->with('user_id', $existingUser->id)->andReturnSelf();
-        $relation->shouldReceive('where')->with('user_id', $newUser->id)->andReturnSelf();
-        $relation->shouldReceive('exists')->andReturn(true, false);
-        $relation->shouldReceive('attach')->with($newUser->id)->once();
-
-        $post->shouldReceive('emailedUsers')->andReturn($relation);
-
-        return $post;
+        $this->assertInstanceOf(PostResult::class, $result);
+        $this->assertEquals($submitPost['title'], $result->title);
+        $this->assertEquals($submitPost['description'], $result->description);
+        $this->assertEquals($submitPost['website_id'], $result->website_id);
     }
 
     public static function missingFieldProvider(): array

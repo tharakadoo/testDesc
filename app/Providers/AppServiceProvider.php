@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Application\Contracts\CacheContract;
+use App\Application\Contracts\TransactionContract;
 use App\Post\Contracts\EmailServiceContract;
 use App\Infrastructure\Repositories\EloquentPostRepository;
 use App\Infrastructure\Repositories\EloquentSubscriptionRepository;
@@ -11,6 +12,7 @@ use App\Infrastructure\Repositories\EloquentWebsiteRepository;
 use App\Infrastructure\Services\EloquentWebsiteUserService;
 use App\Infrastructure\Services\LaravelCacheService;
 use App\Infrastructure\Services\LaravelEmailService;
+use App\Infrastructure\Services\LaravelTransactionService;
 use App\Post\Repositories\PostRepositoryInterface;
 use App\User\Repositories\UserRepositoryInterface;
 use App\Website\Contracts\WebsiteUserServiceContract;
@@ -59,6 +61,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             UserRepositoryInterface::class,
             EloquentUserRepository::class
+        );
+
+        $this->app->bind(
+            TransactionContract::class,
+            LaravelTransactionService::class
         );
     }
 

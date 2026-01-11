@@ -34,14 +34,16 @@ class SendPostPublishedEmail implements ShouldQueue
         );
 
         foreach ($users as $user) {
-            if (!$post->emailedUsers()->where('user_id', $user->id)->exists()) {
-                $this->emailService->send([
-                    'to'   => $user->email,
-                    'post' => $post,
-                ]);
-
-                $post->emailedUsers()->attach($user->id);
+            if ($post->hasUserReceivedEmail($user)) {
+                continue;
             }
+
+            $this->emailService->send([
+                'to'   => $user->email,
+                'post' => $post,
+            ]);
+
+            $post->markEmailSentTo($user);
         }
     }
 

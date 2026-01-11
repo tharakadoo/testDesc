@@ -15,7 +15,7 @@ class PostController extends Controller
 
     public function store(Request $request, Website $website): JsonResponse
     {
-        $post = $this->postSubmit->execute([
+        $result = $this->postSubmit->execute([
             'title' => $request->input('title'),
             'description' => $request->input('description'),
             'website_id' => $website->id,
@@ -24,10 +24,10 @@ class PostController extends Controller
         return response()->json([
             'message' => 'Post created successfully',
             'post' => [
-                'id' => $post->id,
-                'title' => $post->title,
-                'description' => $post->description,
-                'website_id' => $post->website_id,
+                'id' => $result->id,
+                'title' => $result->title,
+                'description' => $result->description,
+                'website_id' => $result->website_id,
             ],
         ], 201);
     }

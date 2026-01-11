@@ -6,6 +6,7 @@ use Mockery;
 use Tests\TestCase;
 use App\User\Entities\User;
 use App\Website\Entities\Website;
+use App\Application\Contracts\TransactionContract;
 use App\User\Repositories\UserRepositoryInterface;
 use App\Website\DataTransferObjects\SubscriptionResult;
 use App\Website\UseCases\SubscribeUseCase;
@@ -30,10 +31,11 @@ class SubscribeUseCaseTest extends TestCase
         $websiteRepository = Mockery::mock(WebsiteRepositoryInterface::class);
         $userRepository = Mockery::mock(UserRepositoryInterface::class);
         $subscriptionRepository = Mockery::mock(SubscriptionRepositoryInterface::class);
+        $transaction = $this->createMockTransaction();
 
         $subscriptionRepository->shouldNotReceive('subscribe');
 
-        $useCase = new SubscribeUseCase($websiteRepository, $userRepository, $subscriptionRepository);
+        $useCase = new SubscribeUseCase($websiteRepository, $userRepository, $subscriptionRepository, $transaction);
 
         $this->assertValidationException($useCase, $subscriptionRequest, $field, $expectedMessage);
     }
@@ -58,7 +60,9 @@ class SubscribeUseCaseTest extends TestCase
         $subscriptionRepository = Mockery::mock(SubscriptionRepositoryInterface::class);
         $subscriptionRepository->shouldNotReceive('subscribe');
 
-        $useCase = new SubscribeUseCase($websiteRepository, $userRepository, $subscriptionRepository);
+        $transaction = $this->createMockTransaction();
+
+        $useCase = new SubscribeUseCase($websiteRepository, $userRepository, $subscriptionRepository, $transaction);
 
         $this->assertWebsiteNotFound($useCase, $subscriptionRequest);
     }
@@ -93,7 +97,9 @@ class SubscribeUseCaseTest extends TestCase
             ->andReturn(true);
         $subscriptionRepository->shouldNotReceive('subscribe');
 
-        $useCase = new SubscribeUseCase($websiteRepository, $userRepository, $subscriptionRepository);
+        $transaction = $this->createMockTransaction();
+
+        $useCase = new SubscribeUseCase($websiteRepository, $userRepository, $subscriptionRepository, $transaction);
 
         $this->assertAlreadySubscribed($useCase, $subscriptionRequest);
     }
@@ -130,11 +136,22 @@ class SubscribeUseCaseTest extends TestCase
             ->once()
             ->with($user, $website);
 
-        $useCase = new SubscribeUseCase($websiteRepository, $userRepository, $subscriptionRepository);
+        $transaction = $this->createMockTransaction();
+
+        $useCase = new SubscribeUseCase($websiteRepository, $userRepository, $subscriptionRepository, $transaction);
 
         $result = $useCase->execute($subscriptionRequest);
 
         $this->assertSubscriptionCreated($result, $user, $website);
+    }
+
+    protected function createMockTransaction(): TransactionContract
+    {
+        $transaction = Mockery::mock(TransactionContract::class);
+        $transaction->shouldReceive('execute')
+            ->andReturnUsing(fn(callable $callback) => $callback());
+
+        return $transaction;
     }
 
     protected function assertValidationException(SubscribeUseCase $useCase, array $subscriptionRequest, string $field, array $expectedMessage): void

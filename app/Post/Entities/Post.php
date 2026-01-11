@@ -30,4 +30,14 @@ class Post extends Model
     {
         return $this->belongsTo(Website::class);
     }
+
+    public function hasUserReceivedEmail(User $user): bool
+    {
+        return $this->emailedUsers()->where('user_id', $user->id)->exists();
+    }
+
+    public function markEmailSentTo(User $user): void
+    {
+        $this->emailedUsers()->attach($user->id);
+    }
 }
