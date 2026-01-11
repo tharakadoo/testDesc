@@ -1,33 +1,83 @@
  
-##OneSyntax TDD Test - Kasun
+## OneSyntax TDD Test - Kasun
 
-###Project Structure:
+### Project Structure:
 - App
   - Application
-    - Contracts ``contract belongs in Application``
+    - Contracts `shared contracts across domains`
       - EmailServiceContract.php
     - Listeners
-      - SendPostPublished.php
-  - Post ``Post domain separated``
-    - DataTransferObjects ``SRP - Validation and business logic separated``
+      - SendPostPublishedEmail.php
+  - Console
+    - Commands
+      - SendPostEmailsCommand.php
+  - Http
+    - Controllers
+      - Controller.php
+      - PostController.php
+      - SubscriptionController.php
+  - Infrastructure `framework-specific implementations`
+    - Email
+      - EmailService.php
+    - Repositories
+      - EloquentPostRepository.php
+      - EloquentSubscriptionRepository.php
+    - Services
+      - EloquentWebsiteUserService.php
+      - LaravelEmailService.php
+  - Mail
+    - PostPublishedMail.php
+  - Post `Post domain (DDD bounded context)`
+    - Contracts
+      - EmailServiceContract.php
+    - DataTransferObjects `SRP - validation separated from business logic`
       - SubmitPostData.php
     - Entities
       - Post.php
       - PostEmailRecipient.php
       - Subscriber.php
-    - Repositories ``Dependency inversion — defines interfaces only, no framework specifics``
+    - Events
+      - PostPublished.php
+    - Repositories `dependency inversion - interfaces only`
       - PostRepositoryInterface.php
-    - UseCases ``How business logic implemented``
+    - Testing
+      - PostSubmitUseCaseTest.php
+    - UseCases `business logic orchestration`
       - PostSubmitUseCase.php
-  - Infrastructure ``Framework-specific implementations``
-    - Repositories
-      - EloquentPostRepository.php
+  - Providers
+    - AppServiceProvider.php
+    - EventServiceProvider.php
   - User
-  - WebSite
-  - Mail
-    - PostPublishedMail.php
+    - Entities
+      - User.php
+  - Website `Website domain (DDD bounded context)`
+    - Contracts
+      - WebsiteUserServiceContract.php
+    - DataTransferObjects
+      - SubscribeData.php
+    - Entities
+      - Website.php
+    - Repositories
+      - SubscriptionRepositoryInterface.php
+    - Testing
+      - SubscribeUseCaseTest.php
+    - UseCases
+      - SubscribeUseCase.php
 - Database
   - factories
+    - PostFactory.php
+    - UserFactory.php
     - WebsiteFactory.php
   - migrations
-    - 001_create_users_table.php
+    - 0001_01_01_000000_create_users_table.php
+    - 0001_01_01_000001_create_cache_table.php
+    - 0001_01_01_000002_create_jobs_table.php
+    - 0001_01_01_000003_create_websites_table.php
+    - 0001_01_01_000004_create_posts_table.php
+    - 0001_01_01_000005_create_post_email_recipients_table.php
+    - 0001_01_01_000006_create_subscribers_table.php
+    - 2025_08_14_170933_add_two_factor_columns_to_users_table.php
+  - seeders
+    - DatabaseSeeder.php
+    - UserSeeder.php
+    - WebsiteSeeder.php

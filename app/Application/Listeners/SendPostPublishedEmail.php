@@ -2,7 +2,7 @@
 
 namespace App\Application\Listeners;
 
-use App\Application\Contracts\EmailServiceContract;
+use App\Post\Contracts\EmailServiceContract;
 use App\Post\Events\PostPublished;
 use Illuminate\Support\Facades\Cache;
 
