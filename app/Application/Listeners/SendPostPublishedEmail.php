@@ -4,9 +4,10 @@ namespace App\Application\Listeners;
 
 use App\Post\Contracts\EmailServiceContract;
 use App\Post\Events\PostPublished;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Cache;
 
-class SendPostPublishedEmail
+class SendPostPublishedEmail implements ShouldQueue
 {
     protected EmailServiceContract $emailService;
 
