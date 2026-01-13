@@ -5,10 +5,12 @@ on:
       - master
   pull_request:
     types: [opened, synchronize, reopened]
+
 permissions:
   contents: read
-  statuses: write  # This is the permission needed to show the icon on the start page
-  security-events: write # This shows results in the "Security" tab
+  statuses: write
+  security-events: write
+
 jobs:
   sonarqube:
     name: SonarQube
@@ -16,7 +18,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
+
+      # NEW: Set up the environment (example for Node.js)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # NEW: Install and Run Tests
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Unit Tests
+        # Adding --coverage creates the file Sonar needs to show percentages
+        run: npm test -- --coverage
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
