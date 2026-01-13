@@ -1,19 +1,25 @@
-name: Build
+
+
+name: SonarCloud
+
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
 jobs:
-  sonarqube:
-    name: SonarQube
+  sonarcloud:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: SonarQube Scan
+          fetch-depth: 0
+
+      - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@a31c93984c7cdbab7368c2c8efdac0ef1b2e341e
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
