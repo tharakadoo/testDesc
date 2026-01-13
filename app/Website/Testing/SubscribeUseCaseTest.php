@@ -18,6 +18,8 @@ use App\Website\Repositories\WebsiteRepositoryInterface;
 
 class SubscribeUseCaseTest extends TestCase
 {
+    private const TEST_EMAIL = self::TEST_EMAIL;
+    private const VALIDATION_EXCEPTION_NOT_THROWN = self::VALIDATION_EXCEPTION_NOT_THROWN;
     protected function tearDown(): void
     {
         Mockery::close();
@@ -44,7 +46,7 @@ class SubscribeUseCaseTest extends TestCase
     public function when_website_not_found_then_throws_validation_exception(): void
     {
         $subscriptionRequest = [
-            'email' => 'user@example.com',
+            'email' => self::TEST_EMAIL,
             'website_id' => 999,
         ];
 
@@ -71,12 +73,12 @@ class SubscribeUseCaseTest extends TestCase
     public function when_already_subscribed_then_throws_validation_exception(): void
     {
         $subscriptionRequest = [
-            'email' => 'user@example.com',
+            'email' => self::TEST_EMAIL,
             'website_id' => 1,
         ];
 
         $website = new Website(['id' => 1, 'url' => 'https://example.com']);
-        $user = new User(['id' => 1, 'email' => 'user@example.com']);
+        $user = new User(['id' => 1, 'email' => self::TEST_EMAIL]);
 
         $websiteRepository = Mockery::mock(WebsiteRepositoryInterface::class);
         $websiteRepository->shouldReceive('find')
@@ -87,7 +89,7 @@ class SubscribeUseCaseTest extends TestCase
         $userRepository = Mockery::mock(UserRepositoryInterface::class);
         $userRepository->shouldReceive('findOrCreate')
             ->once()
-            ->with('user@example.com')
+            ->with(self::TEST_EMAIL)
             ->andReturn($user);
 
         $subscriptionRepository = Mockery::mock(SubscriptionRepositoryInterface::class);
@@ -108,12 +110,12 @@ class SubscribeUseCaseTest extends TestCase
     public function when_subscribe_then_subscription_created(): void
     {
         $subscriptionRequest = [
-            'email' => 'user@example.com',
+            'email' => self::TEST_EMAIL,
             'website_id' => 1,
         ];
 
         $website = new Website(['id' => 1, 'url' => 'https://example.com']);
-        $user = new User(['id' => 1, 'email' => 'user@example.com']);
+        $user = new User(['id' => 1, 'email' => self::TEST_EMAIL]);
 
         $websiteRepository = Mockery::mock(WebsiteRepositoryInterface::class);
         $websiteRepository->shouldReceive('find')
@@ -124,7 +126,7 @@ class SubscribeUseCaseTest extends TestCase
         $userRepository = Mockery::mock(UserRepositoryInterface::class);
         $userRepository->shouldReceive('findOrCreate')
             ->once()
-            ->with('user@example.com')
+            ->with(self::TEST_EMAIL)
             ->andReturn($user);
 
         $subscriptionRepository = Mockery::mock(SubscriptionRepositoryInterface::class);
@@ -158,7 +160,7 @@ class SubscribeUseCaseTest extends TestCase
     {
         try {
             $useCase->execute($subscriptionRequest);
-            $this->fail('Expected ValidationException not thrown');
+            $this->fail(self::VALIDATION_EXCEPTION_NOT_THROWN);
         } catch (ValidationException $e) {
             $this->assertArrayHasKey($field, $e->errors());
             $this->assertEquals($expectedMessage, $e->errors()[$field]);
@@ -169,7 +171,7 @@ class SubscribeUseCaseTest extends TestCase
     {
         try {
             $useCase->execute($subscriptionRequest);
-            $this->fail('Expected ValidationException not thrown');
+            $this->fail(self::VALIDATION_EXCEPTION_NOT_THROWN);
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('website_id', $e->errors());
             $this->assertEquals(['Website not found'], $e->errors()['website_id']);
@@ -180,7 +182,7 @@ class SubscribeUseCaseTest extends TestCase
     {
         try {
             $useCase->execute($subscriptionRequest);
-            $this->fail('Expected ValidationException not thrown');
+            $this->fail(self::VALIDATION_EXCEPTION_NOT_THROWN);
         } catch (ValidationException $e) {
             $this->assertArrayHasKey('email', $e->errors());
             $this->assertEquals(['Already subscribed to this website'], $e->errors()['email']);
@@ -208,7 +210,7 @@ class SubscribeUseCaseTest extends TestCase
                 ['Email must be valid'],
             ],
             'missing website_id' => [
-                ['email' => 'user@example.com', 'website_id' => null],
+                ['email' => self::TEST_EMAIL, 'website_id' => null],
                 'website_id',
                 ['Website is required'],
             ],
