@@ -5,19 +5,20 @@ on:
     branches:
       - main
   pull_request:
-  workflow_dispatch:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch: # This allows you to run it manually to test
 
 jobs:
   sonarcloud:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@a31c93984c7cdbab7368c2c8efdac0ef1b2e341e
+        uses: SonarSource/sonarcloud-github-action@master
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
