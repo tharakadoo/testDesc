@@ -20,22 +20,28 @@ jobs:
         with:
           fetch-depth: 0
 
-      # NEW: Set up the environment (example for Node.js)
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      # 1. Setup PHP with Xdebug (needed for coverage)
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          node-version: '20'
+          php-version: '8.2'
+          extensions: mbstring, dom, fileinfo
+          coverage: xdebug
 
-      # NEW: Install and Run Tests
+      # 2. Install Composer Dependencies
       - name: Install dependencies
-        run: npm install
+        run: composer install --prefer-dist --no-progress
 
-      - name: Run Unit Tests
-        # Adding --coverage creates the file Sonar needs to show percentages
-        run: npm test -- --coverage
+      # 3. Run Laravel Tests and generate Coverage report
+      - name: Run Tests
+        run: php artisan test --coverage-clover=coverage.xml
 
+      # 4. SonarQube Scan
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: >
+            -Dsonar.php.coverage.reportPaths=coverage.xml
