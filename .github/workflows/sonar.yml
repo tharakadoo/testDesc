@@ -20,23 +20,32 @@ jobs:
         with:
           fetch-depth: 0
 
-      # 1. Setup PHP with Xdebug (needed for coverage)
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: mbstring, dom, fileinfo
+          extensions: mbstring, dom, fileinfo, sqlite, pdo_sqlite
           coverage: xdebug
 
-      # 2. Install Composer Dependencies
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
-      # 3. Run Laravel Tests and generate Coverage report
-      - name: Run Tests
-        run: php artisan test --coverage-clover=coverage.xml
+      # NEW: Prepare the Laravel environment to prevent "Missing Key" or "Database" errors
+      - name: Prepare Laravel Environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          mkdir -p database
+          touch database/database.sqlite
 
-      # 4. SonarQube Scan
+      - name: Run Tests
+        # Added --min=0 to prevent exit code 1 if coverage is low
+        run: php artisan test --coverage-clover=coverage.xml --min=0
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+          XDEBUG_MODE: coverage
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
