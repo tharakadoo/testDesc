@@ -18,8 +18,8 @@ use App\Website\Repositories\WebsiteRepositoryInterface;
 
 class SubscribeUseCaseTest extends TestCase
 {
-    private const TEST_EMAIL = self::TEST_EMAIL;
-    private const VALIDATION_EXCEPTION_NOT_THROWN = self::VALIDATION_EXCEPTION_NOT_THROWN;
+    private const TEST_EMAIL = 'user@example.com';
+    private const VALIDATION_EXCEPTION_NOT_THROWN = 'Expected ValidationException not thrown';
     protected function tearDown(): void
     {
         Mockery::close();
