@@ -5,6 +5,10 @@ on:
       - master
   pull_request:
     types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+  statuses: write  # This is the permission needed to show the icon on the start page
+  security-events: write # This shows results in the "Security" tab
 jobs:
   sonarqube:
     name: SonarQube
