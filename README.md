@@ -1,11 +1,21 @@
 [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=tharakadoo_testDesc)](https://sonarcloud.io/summary/new_code?id=tharakadoo_testDesc)
 ## OneSyntax TDD Test - Kasun
 
+This is a **full-stack application** with separate frontend and backend repositories.
+
+| Component | Tech Stack | Repository |
+|-----------|------------|------------|
+| Backend | PHP 8.2+ / Laravel | This repo |
+| Frontend | React 19 / Vite / Tailwind | `../testDescFront` |
+
+---
+
+## Backend
+
 ### Requirements
 - PHP 8.2+
 - Composer
 - MySQL
-- Node.js & npm (for frontend)
 
 ### Installation
 
@@ -81,3 +91,9 @@ curl -X POST http://localhost:8000/api/websites/1/posts \
 # Send emails for a specific post manually
 php artisan posts:send-emails {post_id}
 ```
+
+---
+
+## Frontend
+
+has own readme.md pls refer.
