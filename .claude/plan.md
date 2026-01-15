@@ -23,7 +23,7 @@
 
 
 ## Phase 15: SonarQube Pre-Commit Analysis for Both Repos
-**Status:** [ ] Pending
+**Status:** [x] Complete
 
 ### Goal
 Set up local linting with auto-fix on commit, failing only on unfixable errors. SonarQube full scan runs in CI/CD.
@@ -75,7 +75,7 @@ composer test:arch
 
 ---
 
-### Phase 15.2: Frontend Pre-Commit Hooks (testDescFront)
+### Phase 15.2: Frontend Pre-Commit Hooks (testDescFront) ✅ COMPLETE
 
 **15.2.1 Install Husky & lint-staged**
 ```bash
@@ -108,7 +108,7 @@ npm run test:run
 
 ---
 
-### Phase 15.3: Frontend SonarCloud Setup
+### Phase 15.3: Frontend SonarCloud Setup ✅ COMPLETE
 
 **15.3.1 Create sonar-project.properties**
 ```properties

@@ -100,6 +100,21 @@ Architecture tests enforce code structure rules:
 **Framework Isolation:**
 - Controllers should not use Post/User Entities directly
 
+### Code Quality
+
+#### Git Hooks (Husky)
+
+| Hook | When | What Runs |
+|------|------|-----------|
+| `pre-commit` | On commit | PHP-CS-Fixer (auto-fix) + PHPStan |
+| `pre-push` | On push | Unit tests + Architecture tests |
+
+#### SonarCloud
+
+Analysis runs on every push/PR to master via GitHub Actions:
+- Unit tests with coverage
+- SonarQube scan
+
 ### API Endpoints
 
 | Method | Endpoint | Description |
