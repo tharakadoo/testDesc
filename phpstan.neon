@@ -1,0 +1,14 @@
+includes:
+    - vendor/phpat/phpat/extension.neon
+
+parameters:
+    level: 0
+    paths:
+        - app
+        - tests/Architecture
+
+services:
+    -
+        class: Tests\Architecture\ArchitectureTest
+        tags:
+            - phpat.test

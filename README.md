@@ -6,7 +6,7 @@ This is a **full-stack application** with separate frontend and backend reposito
 | Component | Tech Stack | Repository |
 |-----------|------------|------------|
 | Backend | PHP 8.2+ / Laravel | This repo |
-| Frontend | React 19 / Vite / Tailwind | `../testDescFront` |
+| Frontend | React 19 / Vite / Tailwind | `https://github.com/tharakadoo/testDescFront` |
 
 ---
 
@@ -64,6 +64,24 @@ php artisan queue:work
 composer test
 ```
 
+#### Test Summary
+
+| Type | Command | Count |
+|------|---------|-------|
+| Unit Tests | `composer test` | 18 |
+| Feature Tests | `composer test` | 1 |
+| Architecture Tests | `composer test:arch` | 5 |
+| **Total** | | **24** |
+
+#### Architecture Tests (PHPat)
+
+Architecture tests enforce code structure rules:
+- Controllers should not depend on Repositories directly
+- UseCases should not depend on Controllers
+- Entities should not depend on UseCases
+- Entities should not depend on Repository implementations
+- Production code should not depend on test classes
+
 ### API Endpoints
 
 | Method | Endpoint | Description |
@@ -71,19 +89,6 @@ composer test
 | POST | `/api/websites/{website}/subscribe` | Subscribe to a website |
 | POST | `/api/websites/{website}/posts` | Create a post for a website |
 
-#### Subscribe to a Website
-```bash
-curl -X POST http://localhost:8000/api/websites/1/subscribe \
-  -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com"}'
-```
-
-#### Create a Post
-```bash
-curl -X POST http://localhost:8000/api/websites/1/posts \
-  -H "Content-Type: application/json" \
-  -d '{"title": "Post Title", "description": "Post description"}'
-```
 
 ### Artisan Commands
 
