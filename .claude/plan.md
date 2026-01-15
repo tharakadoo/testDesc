@@ -97,3 +97,36 @@ composer test
 | 1-12 | (See completed phases above) | - | Complete |
 | 13 | Add domain unit tests | Medium | Complete |
 | 14 | Add transaction handling | Medium | Complete |
+
+## Phase 1: Backend - GET /api/websites Endpoint  -- completed
+
+### 1.1 Create Test (TDD)
+**File:** `app/Website/Testing/GetAllWebsitesUseCaseTest.php`
+- Test: `when_get_all_websites_then_returns_collection_of_websites`
+- Test: `when_no_websites_then_returns_empty_collection`
+
+### 1.2 Extend Repository Interface
+**File:** `app/Website/Repositories/WebsiteRepositoryInterface.php`
+- Add: `public function all(): Collection;`
+
+### 1.3 Implement Repository Method
+**File:** `app/Infrastructure/Repositories/EloquentWebsiteRepository.php`
+- Add: `public function all(): Collection { return Website::all(); }`
+
+### 1.4 Create Use Case
+**File:** `app/Website/UseCases/GetAllWebsitesUseCase.php`
+
+### 1.5 Create Controller
+**File:** `app/Http/Controllers/WebsiteController.php`
+- Method: `index()` returns JSON `{ websites: [{ id, url }, ...] }`
+
+### 1.6 Add Route
+**File:** `routes/api.php`
+- Add: `Route::get('/websites', [WebsiteController::class, 'index']);`
+
+### 1.7 Verify
+```bash
+composer test
+```
+
+---
