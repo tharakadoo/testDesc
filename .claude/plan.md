@@ -16,117 +16,180 @@
 | 10 | Enrich domain models | Complete |
 | 11 | Extract email logic to event | Complete |
 | 12 | Create PostResult DTO | Complete |
-
----
-
-## Phase 13: Add Domain Unit Tests
-**Status:** [x] Complete
-
-### Problem:
-No unit tests for domain entities. Tests only cover use cases.
-
-### Note:
-Originally planned to remove mocks from `PostSubmitUseCaseTest`, but mocking is required by OneSyntax guidelines for isolation testing. Mocks remain in use case tests.
-
-Created `PostTest.php` with integration tests for `Post` entity domain behavior. However, these may need to be removed if OneSyntax requires pure unit tests without database (RefreshDatabase trait).
-
-### Tasks:
-- [x] Create `app/Post/Testing/PostTest.php` with tests for `Post` entity behavior
-- [x] Test `markEmailSentTo()` method
-- [x] Test `hasUserReceivedEmail()` method
-- [x] Keep mocks in `PostSubmitUseCaseTest` (OneSyntax requirement)
-
-### Files:
-| File | Action |
-|------|--------|
-| `app/Post/Testing/PostTest.php` | CREATE (may need removal if integration tests not allowed) |
-
-### Run After:
-```bash
-composer test
-```
-
----
-
-## Phase 14: Add Transaction Handling
-**Status:** [x] Complete
-
-### Problem:
-Use cases don't wrap operations in database transactions. If operation fails mid-way, data could be inconsistent.
-
-### Why TransactionContract instead of DB::Transaction?
-
-| Aspect | DB::Transaction | TransactionContract |
-|--------|-----------------|---------------------|
-| Testability | Hard to mock, tests hit real DB | Easy to mock, fast tests without DB |
-| Framework coupling | UseCase depends on Laravel facade | UseCase depends on interface (Clean Architecture) |
-| Swappable | Locked to Laravel | Can swap implementation |
-
-**Trade-off:** More boilerplate (interface, service, binding) but follows OneSyntax rule: no framework imports in domain/use case layer.
-
-**When to use DB::Transaction directly:** Small projects, team prefers Laravel conventions, tests already use RefreshDatabase.
-
-### Tasks:
-- [x] Create `App\Application\Contracts\TransactionContract` interface
-- [x] Create `App\Infrastructure\Services\LaravelTransactionService` implementation
-- [x] Wrap `PostSubmitUseCase::execute()` in transaction
-- [x] Wrap `SubscribeUseCase::execute()` in transaction
-- [x] Bind interface in `AppServiceProvider`
-- [x] Update tests
-
-### Files:
-| File | Action |
-|------|--------|
-| `app/Application/Contracts/TransactionContract.php` | CREATE |
-| `app/Infrastructure/Services/LaravelTransactionService.php` | CREATE |
-| `app/Post/UseCases/PostSubmitUseCase.php` | MODIFY |
-| `app/Website/UseCases/SubscribeUseCase.php` | MODIFY |
-| `app/Providers/AppServiceProvider.php` | MODIFY |
-
-### Run After:
-```bash
-composer test
-```
-
----
-
-# Summary
-
-| Phase | Description | Complexity | Status |
-|-------|-------------|------------|--------|
-| 1-12 | (See completed phases above) | - | Complete |
 | 13 | Add domain unit tests | Medium | Complete |
 | 14 | Add transaction handling | Medium | Complete |
 
-## Phase 1: Backend - GET /api/websites Endpoint  -- completed
+---
 
-### 1.1 Create Test (TDD)
-**File:** `app/Website/Testing/GetAllWebsitesUseCaseTest.php`
-- Test: `when_get_all_websites_then_returns_collection_of_websites`
-- Test: `when_no_websites_then_returns_empty_collection`
 
-### 1.2 Extend Repository Interface
-**File:** `app/Website/Repositories/WebsiteRepositoryInterface.php`
-- Add: `public function all(): Collection;`
+## Phase 15: SonarQube Pre-Commit Analysis for Both Repos
+**Status:** [ ] Pending
 
-### 1.3 Implement Repository Method
-**File:** `app/Infrastructure/Repositories/EloquentWebsiteRepository.php`
-- Add: `public function all(): Collection { return Website::all(); }`
+### Goal
+Set up local linting with auto-fix on commit, failing only on unfixable errors. SonarQube full scan runs in CI/CD.
 
-### 1.4 Create Use Case
-**File:** `app/Website/UseCases/GetAllWebsitesUseCase.php`
+### Current State
 
-### 1.5 Create Controller
-**File:** `app/Http/Controllers/WebsiteController.php`
-- Method: `index()` returns JSON `{ websites: [{ id, url }, ...] }`
+| Component | Backend | Frontend |
+|-----------|---------|----------|
+| SonarCloud config | Yes | No |
+| CI/CD pipeline | Yes (GitHub Actions) | No |
+| Git hooks | No | No |
+| Linting | PHP-CS-Fixer (manual) | ESLint (manual) |
 
-### 1.6 Add Route
-**File:** `routes/api.php`
-- Add: `Route::get('/websites', [WebsiteController::class, 'index']);`
+---
 
-### 1.7 Verify
+### Phase 15.1: Backend Pre-Commit Hooks (testDesc) ✅ COMPLETE
+
+**15.1.1 Install Husky & lint-staged**
+```bash
+npm init -y
+npm install --save-dev husky lint-staged
+npx husky init
+```
+
+**15.1.2 Configure lint-staged in package.json**
+```json
+{
+  "lint-staged": {
+    "*.php": [
+      "./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php",
+      "./vendor/bin/phpstan analyse --configuration=phpstan.neon --no-progress"
+    ]
+  }
+}
+```
+
+**15.1.3 Create pre-commit hook**
+File: `.husky/pre-commit`
+```bash
+npx lint-staged
+```
+
+**15.1.4 Create pre-push hook**
+File: `.husky/pre-push`
 ```bash
 composer test
+composer test:arch
 ```
 
 ---
+
+### Phase 15.2: Frontend Pre-Commit Hooks (testDescFront)
+
+**15.2.1 Install Husky & lint-staged**
+```bash
+npm install --save-dev husky lint-staged
+npx husky init
+```
+
+**15.2.2 Configure lint-staged in package.json**
+```json
+{
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "eslint --fix"
+    ]
+  }
+}
+```
+
+**15.2.3 Create pre-commit hook**
+File: `.husky/pre-commit`
+```bash
+npx lint-staged
+```
+
+**15.2.4 Create pre-push hook**
+File: `.husky/pre-push`
+```bash
+npm run test:run
+```
+
+---
+
+### Phase 15.3: Frontend SonarCloud Setup
+
+**15.3.1 Create sonar-project.properties**
+```properties
+sonar.projectKey=tharakadoo_testDescFront
+sonar.organization=tharakadoo
+sonar.sources=src
+sonar.exclusions=**/node_modules/**,**/dist/**
+sonar.javascript.lcov.reportPaths=coverage/lcov.info
+```
+
+**15.3.2 Add coverage to Vitest**
+```bash
+npm install --save-dev @vitest/coverage-v8
+```
+
+Update `vite.config.js`:
+```js
+test: {
+  coverage: {
+    provider: 'v8',
+    reporter: ['text', 'lcov'],
+  }
+}
+```
+
+**15.3.3 Create GitHub Actions workflow**
+File: `.github/workflows/sonar.yml`
+- Trigger on push/PR to master
+- Run `npm run lint`
+- Run `npm run test:run -- --coverage`
+- Run SonarQube scanner
+
+---
+
+### Files to Create/Modify
+
+#### Backend (testDesc)
+| File | Action |
+|------|--------|
+| `package.json` | Create |
+| `.husky/pre-commit` | Create |
+| `.husky/pre-push` | Create |
+
+#### Frontend (testDescFront)
+| File | Action |
+|------|--------|
+| `package.json` | Update |
+| `.husky/pre-commit` | Create |
+| `.husky/pre-push` | Create |
+| `sonar-project.properties` | Create |
+| `.github/workflows/sonar.yml` | Create |
+| `vite.config.js` | Update |
+
+---
+
+### Verification
+
+1. **Test backend pre-commit:**
+   ```bash
+   cd testDesc
+   echo "<?php \$x=1 ;" > test.php  # Bad formatting
+   git add test.php
+   git commit -m "test"  # Should auto-fix and commit
+   ```
+
+2. **Test frontend pre-commit:**
+   ```bash
+   cd testDescFront
+   echo "const x = 1" > src/test.js  # Missing semicolon
+   git add src/test.js
+   git commit -m "test"  # Should auto-fix and commit
+   ```
+
+3. **Test pre-push (should fail if tests fail):**
+   ```bash
+   git push  # Runs tests before push
+   ```
+
+4. **Verify SonarCloud:**
+   - Push to GitHub
+   - Check SonarCloud dashboard for both projects
+
+---
+
