@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Str;
 
-const DEFAULT_DB_HOST = '127.0.0.1';
+if (!defined('DEFAULT_DB_HOST')) {
+    define('DEFAULT_DB_HOST', '127.0.0.1');
+}
 
 return [
 
