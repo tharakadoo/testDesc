@@ -46,6 +46,9 @@ jobs:
           DB_DATABASE: database/database.sqlite
           XDEBUG_MODE: coverage
 
+      - name: Run Architecture Tests (PHPat)
+        run: composer test:arch
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
