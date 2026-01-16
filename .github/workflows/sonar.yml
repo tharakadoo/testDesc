@@ -57,3 +57,9 @@ jobs:
         with:
           args: >
             -Dsonar.php.coverage.reportPaths=coverage.xml
+
+      - name: SonarQube Quality Gate Check
+        uses: SonarSource/sonarqube-quality-gate-action@v1
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
