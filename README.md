@@ -68,37 +68,11 @@ composer test
 
 | Type | Command | Count |
 |------|---------|-------|
-| Unit Tests | `composer test` | 18 |
-| Feature Tests | `composer test` | 1 |
+| Domain Layer Tests | `composer test` | 12 |
+| Application Layer Tests | `composer test` | 6 |
+| Infrastructure Layer Tests | `composer test` | 18 |
 | Architecture Tests | `composer test:arch` | 15 |
-| **Total** | | **34** |
-
-#### Architecture Tests (PHPat)
-
-Architecture tests enforce code structure rules:
-
-**Layer Dependencies:**
-- Controllers should not depend on Repositories directly
-- UseCases should not depend on Controllers
-- Entities should not depend on UseCases
-- Entities should not depend on Repository implementations
-- Production code should not depend on test classes
-- DTOs should not depend on Repositories
-- Events should not depend on UseCases or Controllers
-- Infrastructure should not depend on Http layer
-
-**Domain Isolation:**
-- Post domain should not depend on Website internals
-- Website domain should not depend on Post internals
-- User domain should be independent of other domains
-
-**Naming Conventions:**
-- UseCase classes must end with `UseCase`
-- Repository interfaces must end with `Interface`
-- Contracts must end with `Contract`
-
-**Framework Isolation:**
-- Controllers should not use Post/User Entities directly
+| **Total** | | **47** |
 
 ### API Endpoints
 
