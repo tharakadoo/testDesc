@@ -121,4 +121,10 @@ Automated CI/CD pipeline runs on every push:
 
 ## Frontend
 
-has own readme.md pls refer.
+The frontend is in a separate repository with its own documentation.
+
+**Repository:** [tharakadoo/testDescFront](https://github.com/tharakadoo/testDescFront)
+
+**Tech Stack:** React 19, Vite, Tailwind CSS
+
+Please refer to the frontend repository's README.md for setup and development instructions.
