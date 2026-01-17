@@ -6,7 +6,7 @@ This is a **full-stack application** with separate frontend and backend reposito
 | Component | Tech Stack | Repository |
 |-----------|------------|------------|
 | Backend | PHP 8.2+ / Laravel | This repo |
-| Frontend | React 19 / Vite / Tailwind | `https://github.com/tharakadoo/testDescFront` |
+| Frontend | React 19 / Vite / Tailwind | https://github.com/tharakadoo/testDescFront |
 
 ---
 
@@ -21,7 +21,7 @@ This is a **full-stack application** with separate frontend and backend reposito
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/tharakadoo/testDesc
 cd testDesc
 
 # Install PHP dependencies
@@ -34,18 +34,12 @@ cp .env.example .env
 php artisan key:generate
 
 # Configure database in .env
-# DB_CONNECTION=mysql
-# DB_HOST=127.0.0.1
-# DB_PORT=3306
-# DB_DATABASE=your_database
-# DB_USERNAME=your_username
-# DB_PASSWORD=your_password
 
 # Run migrations
 php artisan migrate
 
-# Seed websites data
-php artisan db:seed --class=WebsiteSeeder
+# Seed sample data
+php artisan db:seed
 ```
 
 ### Running the Application
@@ -58,10 +52,26 @@ php artisan serve
 php artisan queue:work
 ```
 
+### Git Hooks (Husky)
+
+This project uses **Husky** for automated Git hooks to enforce code quality:
+
+**Pre-commit Hook** (runs on `git commit`)
+- PHP code style fixes (php-cs-fixer)
+- Static analysis (PHPStan)
+
+**Pre-push Hook** (runs on `git push`)
+- All unit and integration tests: `composer test`
+- Architecture tests: `composer test:arch`
+
 ### Running Tests
 
 ```bash
+# Run all tests
 composer test
+
+# Run architecture tests only
+composer test:arch
 ```
 
 #### Test Summary
@@ -74,20 +84,38 @@ composer test
 | Architecture Tests | `composer test:arch` | 15 |
 | **Total** | | **47** |
 
+
+### Code Quality & CI/CD
+
+#### SonarQube Integration
+
+This project uses **SonarCloud** for continuous code quality analysis:
+
+**View project:** [SonarCloud Dashboard](https://sonarcloud.io/summary/new_code?id=tharakadoo_testDesc)
+
+#### GitHub Actions
+
+Automated CI/CD pipeline runs on every push:
+
+**Workflow:** `.github/workflows/` (configured with ArchUnit tests)
+
+**What runs:**
+1. PHP linting and syntax checks
+2. All unit, integration and Architecture tests
+3. SonarCloud quality analysis
+4. Code coverage report generation
+
+**Quality Gate Checks:**
+- ✅ All tests must pass
+- ✅ Code must pass linting
+- ✅ SonarQube quality gate status
+
 ### API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/websites/{website}/subscribe` | Subscribe to a website |
 | POST | `/api/websites/{website}/posts` | Create a post for a website |
-
-
-### Artisan Commands
-
-```bash
-# Send emails for a specific post manually
-php artisan posts:send-emails {post_id}
-```
 
 ---
 
