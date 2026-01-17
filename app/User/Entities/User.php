@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class User extends Model
 {
     use HasFactory;
-    protected $fillable = ['email', 'name'];
+    protected $fillable = ['email', 'name', 'password'];
 
     protected static function newFactory(): UserFactory
     {

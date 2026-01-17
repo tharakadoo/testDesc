@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Repositories;
 
 use App\User\Entities\User;
+use Illuminate\Support\Facades\Hash;
 use App\User\Repositories\UserRepositoryInterface;
 
 final class EloquentUserRepository implements UserRepositoryInterface
@@ -11,7 +12,10 @@ final class EloquentUserRepository implements UserRepositoryInterface
     {
         return User::firstOrCreate(
             ['email' => $email],
-            ['name' => explode('@', $email)[0]]
+            [
+                'name' => explode('@', $email)[0],
+                'password' => Hash::make('temporary-password'),
+            ]
         );
     }
 }
