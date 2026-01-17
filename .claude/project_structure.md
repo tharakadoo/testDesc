@@ -93,7 +93,6 @@
             - SubmitPostData.php
         - Entities
             - Post.php
-            - PostEmailRecipient.php
             - Subscriber.php
         - Events
             - PostPublished.php
