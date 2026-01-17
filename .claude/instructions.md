@@ -40,6 +40,7 @@ Run PHP tests with:
 
 **IMPORTANT:** Before generating or modifying any code, ALWAYS read and apply ALL rules from the `.claude` folder:
 - `.claude/onesyntax/playbook.md` - Rules for development
+- `.claude/onesyntax_test.md` - rules for test.
 - `.claude/onesyntax/repo.md` - company approved repo structure
 - `.claude/onesyntax/code_reviewer.md` - expected standards
 

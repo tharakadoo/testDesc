@@ -10,6 +10,9 @@ use PHPat\Test\Builder\Rule;
 
 final class ArchitectureTest
 {
+    private const CONTROLLERS_NAMESPACE = 'App\Http\Controllers';
+    private const USECASE_PATTERN = '/.*UseCase.*/';
+
     // ==========================================
     // LAYER DEPENDENCY RULES
     // ==========================================
@@ -21,7 +24,7 @@ final class ArchitectureTest
     public function test_controllers_should_not_depend_on_repositories(): Rule
     {
         return PHPat::rule()
-            ->classes(Selector::inNamespace('App\Http\Controllers'))
+            ->classes(Selector::inNamespace(self::CONTROLLERS_NAMESPACE))
             ->shouldNotDependOn()
             ->classes(Selector::classname('/.*Repository.*/', true))
             ->because('Controllers should use UseCases, not Repositories directly');
@@ -33,9 +36,9 @@ final class ArchitectureTest
     public function test_usecases_should_not_depend_on_controllers(): Rule
     {
         return PHPat::rule()
-            ->classes(Selector::classname('/.*UseCase.*/', true))
+            ->classes(Selector::classname(self::USECASE_PATTERN, true))
             ->shouldNotDependOn()
-            ->classes(Selector::inNamespace('App\Http\Controllers'))
+            ->classes(Selector::inNamespace(self::CONTROLLERS_NAMESPACE))
             ->because('UseCases should not depend on Controllers');
     }
 
@@ -47,7 +50,7 @@ final class ArchitectureTest
         return PHPat::rule()
             ->classes(Selector::inNamespace('/App\\\\.*\\\\Entities/', true))
             ->shouldNotDependOn()
-            ->classes(Selector::classname('/.*UseCase.*/', true))
+            ->classes(Selector::classname(self::USECASE_PATTERN, true))
             ->because('Entities should not depend on UseCases');
     }
 
@@ -98,8 +101,8 @@ final class ArchitectureTest
             ->classes(Selector::inNamespace('/App\\\\.*\\\\Events/', true))
             ->shouldNotDependOn()
             ->classes(
-                Selector::classname('/.*UseCase.*/', true),
-                Selector::inNamespace('App\Http\Controllers')
+                Selector::classname(self::USECASE_PATTERN, true),
+                Selector::inNamespace(self::CONTROLLERS_NAMESPACE)
             )
             ->because('Events should only carry data, not depend on application logic');
     }
@@ -215,7 +218,7 @@ final class ArchitectureTest
     public function test_controllers_should_not_use_post_or_user_entities_directly(): Rule
     {
         return PHPat::rule()
-            ->classes(Selector::inNamespace('App\Http\Controllers'))
+            ->classes(Selector::inNamespace(self::CONTROLLERS_NAMESPACE))
             ->shouldNotDependOn()
             ->classes(
                 Selector::inNamespace('App\Post\Entities'),
