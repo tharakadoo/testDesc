@@ -85,6 +85,14 @@ composer test:arch
 | **Total** | | **47** |
 
 
+### Error Tracking & Monitoring
+
+#### Sentry Integration
+
+This project uses **Sentry** for error tracking and performance monitoring:
+
+**Configuration:** Set `SENTRY_DSN` environment variable in `.env`
+
 ### Code Quality & CI/CD
 
 #### SonarQube Integration
