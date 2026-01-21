@@ -1,5 +1,6 @@
 <?php
 
+use Sentry\Laravel\Integration;
 use Illuminate\Foundation\Application;
 use App\Http\Middleware\SetSentryUserContext;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -16,5 +17,5 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(SetSentryUserContext::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        Integration::handles($exceptions);
     })->create();
