@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Post\IO\Http\Commands;
 
 use App\Post\Entities\Post;
-use App\Post\Events\PostPublished;
+use App\Post\Entities\Events\PostPublished;
 use Illuminate\Console\Command;
 
 class SendPostEmailsCommand extends Command

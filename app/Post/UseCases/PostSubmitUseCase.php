@@ -2,11 +2,11 @@
 
 namespace App\Post\UseCases;
 
-use App\Post\Events\PostPublished;
+use App\Post\Entities\Events\PostPublished;
 use App\Foundation\UseCases\TransactionContract;
-use App\Post\DataTransferObjects\PostResult;
-use App\Post\DataTransferObjects\SubmitPostData;
-use App\Post\Repositories\PostRepositoryInterface;
+use App\Post\UseCases\DataTransferObjects\PostResult;
+use App\Post\UseCases\DataTransferObjects\SubmitPostData;
+use App\Post\UseCases\Repositories\PostRepositoryInterface;
 
 class PostSubmitUseCase
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Console\Testing;
+namespace App\Post\Testing;
 
 use Tests\TestCase;
 use App\Post\Entities\Post;
 use Illuminate\Console\Command;
 use App\Website\Entities\Website;
-use App\Post\Events\PostPublished;
+use App\Post\Entities\Events\PostPublished;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;

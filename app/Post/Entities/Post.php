@@ -4,7 +4,7 @@ namespace App\Post\Entities;
 
 use App\User\Entities\User;
 use App\Website\Entities\Website;
-use Database\Factories\PostFactory;
+use App\Post\IO\Database\factories\PostFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

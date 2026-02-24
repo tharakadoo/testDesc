@@ -5,15 +5,15 @@ namespace App\Post\Testing;
 use Mockery;
 use Tests\TestCase;
 use App\Post\Entities\Post;
-use App\Post\Events\PostPublished;
+use App\Post\Entities\Events\PostPublished;
 use App\Foundation\UseCases\TransactionContract;
-use App\Post\DataTransferObjects\PostResult;
+use App\Post\UseCases\DataTransferObjects\PostResult;
 use App\Post\UseCases\PostSubmitUseCase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use App\Post\Repositories\PostRepositoryInterface;
+use App\Post\UseCases\Repositories\PostRepositoryInterface;
 
 class PostSubmitUseCaseTest extends TestCase
 {
