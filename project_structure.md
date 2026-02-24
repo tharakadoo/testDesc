@@ -1,120 +1,151 @@
 # Project Structure
 
-## Clean Architecture Layers
+## Domain-Module Architecture
+
+Each domain module follows the same layered structure:
 
 ```
 ┌─────────────────────────────────────┐
-│         Presentation Layer          │  Http/Controllers, Console/Commands
+│          Entities Layer             │  Domain models, events, business rules
 ├─────────────────────────────────────┤
-│        Application Layer            │  UseCases, Application/Listeners
+│          UseCases Layer             │  Application logic, contracts, repository interfaces, DTOs
 ├─────────────────────────────────────┤
-│          Domain Layer               │  Entities, Events, Repositories (interfaces)
+│          Adapters Layer             │  Framework-agnostic interface adapters
 ├─────────────────────────────────────┤
-│       Infrastructure Layer          │  Infrastructure/Repositories, Infrastructure/Services
+│            IO Layer                 │  Controllers, Eloquent repos, services, migrations, providers
+├─────────────────────────────────────┤
+│          Testing Layer              │  All tests for the module
 └─────────────────────────────────────┘
 ```
 
 ## File Structure
 
 - App
-    - Application
-        - Contracts
+    - Foundation
+        - Entities
+        - UseCases
             - CacheContract.php
             - TransactionContract.php
-        - Listeners
-            - SendPostPublishedEmail.php
+        - Adapters
+        - IO
+            - Database
+                - migrations
+                    - 0001_01_01_000001_create_cache_table.php
+                    - 0001_01_01_000002_create_jobs_table.php
+                - seeders
+                    - DatabaseSeeder.php
+            - Http
+                - Controllers
+                    - Controller.php
+                - Middleware
+                    - SetSentryUserContext.php
+            - ExternalServices
+                - LaravelCacheService.php
+                - LaravelTransactionService.php
+            - FoundationServiceProvider.php
+        - Specs
         - Testing
-            - SendPostPublishedEmailTest.php
-    - Console
-        - Commands
-            - SendPostEmailsCommand.php
-        - Testing
-            - SendPostEmailsCommandTest.php
-    - Http
-        - Controllers
-            - Controller.php
-            - PostController.php
-            - SubscriptionController.php
-    - Infrastructure
-        - Email
-            - EmailService.php
-        - Repositories
-            - EloquentPostRepository.php
-            - EloquentSubscriptionRepository.php
-            - EloquentUserRepository.php
-            - EloquentWebsiteRepository.php
-        - Services
-            - EloquentWebsiteUserService.php
-            - LaravelCacheService.php
-            - LaravelEmailService.php
-            - LaravelTransactionService.php
-        - Testing
-            - EloquentPostRepositoryTest.php
-            - EloquentSubscriptionRepositoryTest.php
-            - EloquentUserRepositoryTest.php
-            - EloquentWebsiteRepositoryTest.php
-            - EloquentWebsiteUserServiceTest.php
-            - LaravelEmailServiceTest.php
-    - Mail
-        - PostPublishedMail.php
     - Post
-        - Contracts
-            - EmailServiceContract.php
-        - DataTransferObjects
-            - PostResult.php
-            - SubmitPostData.php
         - Entities
             - Post.php
             - Subscriber.php
-        - Events
-            - PostPublished.php
-        - Repositories
-            - PostRepositoryInterface.php
-        - Testing
-            - PostSubmitUseCaseTest.php
-            - PostTest.php
+            - Events
+                - PostPublished.php
         - UseCases
             - PostSubmitUseCase.php
-    - Providers
-        - AppServiceProvider.php
-        - EventServiceProvider.php
+            - EmailServiceContract.php
+            - DataTransferObjects
+                - PostResult.php
+                - SubmitPostData.php
+            - Repositories
+                - PostRepositoryInterface.php
+        - Adapters
+        - IO
+            - Database
+                - EloquentPostRepository.php
+                - factories
+                    - PostFactory.php
+                - migrations
+                    - 0001_01_01_000004_create_posts_table.php
+                    - 0001_01_01_000005_create_post_email_recipients_table.php
+                    - 0001_01_01_000006_create_subscribers_table.php
+            - Http
+                - Controllers
+                    - PostController.php
+                - Commands
+                    - SendPostEmailsCommand.php
+            - ExternalServices
+                - EmailService.php
+                - LaravelEmailService.php
+                - PostPublishedMail.php
+            - Listeners
+                - SendPostPublishedEmail.php
+            - PostServiceProvider.php
+        - Specs
+        - Testing
+            - EloquentPostRepositoryTest.php
+            - LaravelEmailServiceTest.php
+            - PostSubmitUseCaseTest.php
+            - PostTest.php
+            - SendPostEmailsCommandTest.php
+            - SendPostPublishedEmailTest.php
     - User
         - Entities
             - User.php
-        - Repositories
-            - UserRepositoryInterface.php
+        - UseCases
+            - Repositories
+                - UserRepositoryInterface.php
+        - Adapters
+        - IO
+            - Database
+                - EloquentUserRepository.php
+                - factories
+                    - UserFactory.php
+                - migrations
+                    - 0001_01_01_000000_create_users_table.php
+                    - 2025_08_14_170933_add_two_factor_columns_to_users_table.php
+                - seeders
+                    - UserSeeder.php
+            - UserServiceProvider.php
+        - Specs
+        - Testing
+            - EloquentUserRepositoryTest.php
     - Website
-        - Contracts
-            - WebsiteUserServiceContract.php
-        - DataTransferObjects
-            - SubscribeData.php
-            - SubscriptionResult.php
         - Entities
             - Website.php
-        - Repositories
-            - SubscriptionRepositoryInterface.php
-            - WebsiteRepositoryInterface.php
-        - Testing
-            - SubscribeUseCaseTest.php
         - UseCases
+            - GetAllWebsitesUseCase.php
             - SubscribeUseCase.php
-- Database
-    - factories
-        - PostFactory.php
-        - UserFactory.php
-        - WebsiteFactory.php
-    - migrations
-        - 0001_01_01_000000_create_users_table.php
-        - 0001_01_01_000001_create_cache_table.php
-        - 0001_01_01_000002_create_jobs_table.php
-        - 0001_01_01_000003_create_websites_table.php
-        - 0001_01_01_000004_create_posts_table.php
-        - 0001_01_01_000005_create_post_email_recipients_table.php
-        - 0001_01_01_000006_create_subscribers_table.php
-        - 2025_08_14_170933_add_two_factor_columns_to_users_table.php
-    - seeders
-        - DatabaseSeeder.php
-        - UserSeeder.php
-        - WebsiteSeeder.php
+            - WebsiteUserServiceContract.php
+            - DataTransferObjects
+                - SubscribeData.php
+                - SubscriptionResult.php
+            - Repositories
+                - SubscriptionRepositoryInterface.php
+                - WebsiteRepositoryInterface.php
+        - Adapters
+        - IO
+            - Database
+                - EloquentSubscriptionRepository.php
+                - EloquentWebsiteRepository.php
+                - EloquentWebsiteUserService.php
+                - factories
+                    - WebsiteFactory.php
+                - migrations
+                    - 0001_01_01_000003_create_websites_table.php
+                - seeders
+                    - WebsiteSeeder.php
+            - Http
+                - Controllers
+                    - SubscriptionController.php
+                    - WebsiteController.php
+            - WebsiteServiceProvider.php
+        - Specs
+        - Testing
+            - EloquentSubscriptionRepositoryTest.php
+            - EloquentWebsiteRepositoryTest.php
+            - EloquentWebsiteUserServiceTest.php
+            - GetAllWebsitesUseCaseTest.php
+            - SubscribeUseCaseTest.php
 
 ---
