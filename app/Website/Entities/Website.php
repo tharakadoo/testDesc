@@ -4,7 +4,7 @@ namespace App\Website\Entities;
 
 use App\Post\Entities\Post;
 use App\User\Entities\User;
-use Database\Factories\WebsiteFactory;
+use App\Website\IO\Database\factories\WebsiteFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

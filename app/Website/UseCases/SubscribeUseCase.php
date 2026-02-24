@@ -4,10 +4,10 @@ namespace App\Website\UseCases;
 
 use App\Foundation\UseCases\TransactionContract;
 use App\User\UseCases\Repositories\UserRepositoryInterface;
-use App\Website\DataTransferObjects\SubscribeData;
-use App\Website\DataTransferObjects\SubscriptionResult;
-use App\Website\Repositories\SubscriptionRepositoryInterface;
-use App\Website\Repositories\WebsiteRepositoryInterface;
+use App\Website\UseCases\DataTransferObjects\SubscribeData;
+use App\Website\UseCases\DataTransferObjects\SubscriptionResult;
+use App\Website\UseCases\Repositories\SubscriptionRepositoryInterface;
+use App\Website\UseCases\Repositories\WebsiteRepositoryInterface;
 use Illuminate\Validation\ValidationException;
 
 class SubscribeUseCase

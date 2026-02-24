@@ -6,7 +6,7 @@ use Mockery;
 use Tests\TestCase;
 use App\Website\Entities\Website;
 use App\Website\UseCases\GetAllWebsitesUseCase;
-use App\Website\Repositories\WebsiteRepositoryInterface;
+use App\Website\UseCases\Repositories\WebsiteRepositoryInterface;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 

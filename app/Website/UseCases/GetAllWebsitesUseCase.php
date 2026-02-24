@@ -2,7 +2,7 @@
 
 namespace App\Website\UseCases;
 
-use App\Website\Repositories\WebsiteRepositoryInterface;
+use App\Website\UseCases\Repositories\WebsiteRepositoryInterface;
 use Illuminate\Support\Collection;
 
 class GetAllWebsitesUseCase

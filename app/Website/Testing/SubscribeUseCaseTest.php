@@ -8,13 +8,13 @@ use App\User\Entities\User;
 use App\Website\Entities\Website;
 use App\Foundation\UseCases\TransactionContract;
 use App\User\UseCases\Repositories\UserRepositoryInterface;
-use App\Website\DataTransferObjects\SubscriptionResult;
+use App\Website\UseCases\DataTransferObjects\SubscriptionResult;
 use App\Website\UseCases\SubscribeUseCase;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use App\Website\Repositories\SubscriptionRepositoryInterface;
-use App\Website\Repositories\WebsiteRepositoryInterface;
+use App\Website\UseCases\Repositories\SubscriptionRepositoryInterface;
+use App\Website\UseCases\Repositories\WebsiteRepositoryInterface;
 
 class SubscribeUseCaseTest extends TestCase
 {
