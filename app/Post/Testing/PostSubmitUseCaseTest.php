@@ -6,7 +6,7 @@ use Mockery;
 use Tests\TestCase;
 use App\Post\Entities\Post;
 use App\Post\Events\PostPublished;
-use App\Application\Contracts\TransactionContract;
+use App\Foundation\UseCases\TransactionContract;
 use App\Post\DataTransferObjects\PostResult;
 use App\Post\UseCases\PostSubmitUseCase;
 use Illuminate\Support\Facades\Event;

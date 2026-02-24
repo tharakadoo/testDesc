@@ -6,7 +6,7 @@ use Mockery;
 use Tests\TestCase;
 use App\User\Entities\User;
 use App\Website\Entities\Website;
-use App\Application\Contracts\TransactionContract;
+use App\Foundation\UseCases\TransactionContract;
 use App\User\Repositories\UserRepositoryInterface;
 use App\Website\DataTransferObjects\SubscriptionResult;
 use App\Website\UseCases\SubscribeUseCase;

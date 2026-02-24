@@ -2,7 +2,7 @@
 
 use Sentry\Laravel\Integration;
 use Illuminate\Foundation\Application;
-use App\Http\Middleware\SetSentryUserContext;
+use App\Foundation\IO\Http\Middleware\SetSentryUserContext;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 

@@ -3,7 +3,7 @@
 namespace App\Post\UseCases;
 
 use App\Post\Events\PostPublished;
-use App\Application\Contracts\TransactionContract;
+use App\Foundation\UseCases\TransactionContract;
 use App\Post\DataTransferObjects\PostResult;
 use App\Post\DataTransferObjects\SubmitPostData;
 use App\Post\Repositories\PostRepositoryInterface;
