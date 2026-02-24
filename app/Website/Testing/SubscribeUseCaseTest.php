@@ -7,7 +7,7 @@ use Tests\TestCase;
 use App\User\Entities\User;
 use App\Website\Entities\Website;
 use App\Foundation\UseCases\TransactionContract;
-use App\User\Repositories\UserRepositoryInterface;
+use App\User\UseCases\Repositories\UserRepositoryInterface;
 use App\Website\DataTransferObjects\SubscriptionResult;
 use App\Website\UseCases\SubscribeUseCase;
 use Illuminate\Validation\ValidationException;

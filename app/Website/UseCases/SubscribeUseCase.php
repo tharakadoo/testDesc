@@ -3,7 +3,7 @@
 namespace App\Website\UseCases;
 
 use App\Foundation\UseCases\TransactionContract;
-use App\User\Repositories\UserRepositoryInterface;
+use App\User\UseCases\Repositories\UserRepositoryInterface;
 use App\Website\DataTransferObjects\SubscribeData;
 use App\Website\DataTransferObjects\SubscriptionResult;
 use App\Website\Repositories\SubscriptionRepositoryInterface;
