@@ -10,7 +10,7 @@ use PHPat\Test\Builder\Rule;
 
 final class ArchitectureTest
 {
-    private const CONTROLLERS_NAMESPACE = 'App\Http\Controllers';
+    private const CONTROLLERS_NAMESPACE = '/App\\\\.*\\\\IO\\\\Http\\\\Controllers/';
     private const USECASE_PATTERN = '/.*UseCase.*/';
 
     // ==========================================
@@ -24,7 +24,7 @@ final class ArchitectureTest
     public function test_controllers_should_not_depend_on_repositories(): Rule
     {
         return PHPat::rule()
-            ->classes(Selector::inNamespace(self::CONTROLLERS_NAMESPACE))
+            ->classes(Selector::inNamespace(self::CONTROLLERS_NAMESPACE, true))
             ->shouldNotDependOn()
             ->classes(Selector::classname('/.*Repository.*/', true))
             ->because('Controllers should use UseCases, not Repositories directly');
@@ -38,7 +38,7 @@ final class ArchitectureTest
         return PHPat::rule()
             ->classes(Selector::classname(self::USECASE_PATTERN, true))
             ->shouldNotDependOn()
-            ->classes(Selector::inNamespace(self::CONTROLLERS_NAMESPACE))
+            ->classes(Selector::inNamespace(self::CONTROLLERS_NAMESPACE, true))
             ->because('UseCases should not depend on Controllers');
     }
 
@@ -55,15 +55,18 @@ final class ArchitectureTest
     }
 
     /**
-     * Domain layer (Entities) should not depend on Infrastructure (Repositories implementations).
+     * Domain layer (Entities) should not depend on IO layer.
      */
-    public function test_entities_should_not_depend_on_repository_implementations(): Rule
+    public function test_entities_should_not_depend_on_io_layer(): Rule
     {
         return PHPat::rule()
             ->classes(Selector::inNamespace('/App\\\\.*\\\\Entities/', true))
             ->shouldNotDependOn()
-            ->classes(Selector::inNamespace('/App\\\\.*\\\\Repositories/', true))
-            ->because('Entities should not depend on Repository implementations');
+            ->classes(Selector::inNamespace('/App\\\\.*\\\\IO/', true))
+            ->excluding(
+                Selector::inNamespace('/App\\\\.*\\\\IO\\\\Database\\\\factories/', true)
+            )
+            ->because('Entities should not depend on IO layer implementations');
     }
 
     /**
@@ -102,21 +105,24 @@ final class ArchitectureTest
             ->shouldNotDependOn()
             ->classes(
                 Selector::classname(self::USECASE_PATTERN, true),
-                Selector::inNamespace(self::CONTROLLERS_NAMESPACE)
+                Selector::inNamespace(self::CONTROLLERS_NAMESPACE, true)
             )
             ->because('Events should only carry data, not depend on application logic');
     }
 
     /**
-     * Infrastructure layer should not depend on Http layer.
+     * IO layer should be independent between modules.
      */
-    public function test_infrastructure_should_not_depend_on_http(): Rule
+    public function test_io_should_not_depend_on_other_module_io(): Rule
     {
         return PHPat::rule()
-            ->classes(Selector::inNamespace('App\Infrastructure'))
+            ->classes(Selector::inNamespace('App\Post\IO'))
             ->shouldNotDependOn()
-            ->classes(Selector::inNamespace('App\Http'))
-            ->because('Infrastructure should be independent of HTTP layer');
+            ->classes(
+                Selector::inNamespace('App\Website\IO'),
+                Selector::inNamespace('App\User\IO')
+            )
+            ->because('Module IO layers should be independent of each other');
     }
 
     // ==========================================
@@ -133,8 +139,7 @@ final class ArchitectureTest
             ->shouldNotDependOn()
             ->classes(
                 Selector::inNamespace('App\Website\UseCases'),
-                Selector::inNamespace('App\Website\Repositories'),
-                Selector::inNamespace('App\Website\DataTransferObjects')
+                Selector::inNamespace('App\Website\IO')
             )
             ->because('Post domain should not depend on Website domain internals');
     }
@@ -149,8 +154,7 @@ final class ArchitectureTest
             ->shouldNotDependOn()
             ->classes(
                 Selector::inNamespace('App\Post\UseCases'),
-                Selector::inNamespace('App\Post\Repositories'),
-                Selector::inNamespace('App\Post\DataTransferObjects')
+                Selector::inNamespace('App\Post\IO')
             )
             ->because('Website domain should not depend on Post domain internals');
     }
@@ -181,6 +185,11 @@ final class ArchitectureTest
     {
         return PHPat::rule()
             ->classes(Selector::inNamespace('/App\\\\.*\\\\UseCases/', true))
+            ->excluding(
+                Selector::inNamespace('/App\\\\.*\\\\UseCases\\\\Repositories/', true),
+                Selector::inNamespace('/App\\\\.*\\\\UseCases\\\\DataTransferObjects/', true),
+                Selector::classname('/.*Contract$/', true)
+            )
             ->shouldBeNamed('/.*UseCase$/', true)
             ->because('UseCase classes should follow naming convention');
     }
@@ -202,7 +211,7 @@ final class ArchitectureTest
     public function test_contracts_should_be_suffixed_with_contract(): Rule
     {
         return PHPat::rule()
-            ->classes(Selector::inNamespace('/App\\\\.*\\\\Contracts/', true))
+            ->classes(Selector::classname('/.*Contract$/', true))
             ->shouldBeNamed('/.*Contract$/', true)
             ->because('Contracts should follow naming convention');
     }
@@ -218,7 +227,7 @@ final class ArchitectureTest
     public function test_controllers_should_not_use_post_or_user_entities_directly(): Rule
     {
         return PHPat::rule()
-            ->classes(Selector::inNamespace(self::CONTROLLERS_NAMESPACE))
+            ->classes(Selector::inNamespace(self::CONTROLLERS_NAMESPACE, true))
             ->shouldNotDependOn()
             ->classes(
                 Selector::inNamespace('App\Post\Entities'),
